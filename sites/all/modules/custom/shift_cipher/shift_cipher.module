@@ -49,14 +49,19 @@ function shift_form()
     return $form;
 }
 
-function element_validate_direction()
+function element_validate_direction($element)
 {
-
+    if (!($element['#value'] == 'right' || $element['#value'] == 'left')) {
+        form_error($element, t('The direction must be either "right" or "left".'));
+    }
 }
 
-function element_validate_phrase()
+function element_validate_phrase($element)
 {
-
+    $phrase = $element['#value'];
+    if (!(preg_match("/^[a-zA-Z\s\.,;!?']+$/", $phrase) === 1)) {
+        form_error($element, t('The only special characters allowed are spaces and punctuation.'));
+    }
 }
 
 function shift_form_submit($form, &$form_state)
