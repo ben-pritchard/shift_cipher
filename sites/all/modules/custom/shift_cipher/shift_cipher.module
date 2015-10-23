@@ -1,0 +1,81 @@
+<?php
+
+function shift_cipher_menu()
+{
+    $items = array();
+    $items['shift_cipher'] = array(
+        'title' => 'Shift Cipher',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('shift_form'),
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
+    $items['shift_cipher_encryption'] = array(
+        'title' => 'Shift Cipher Encryption',
+        'page callback' => 'show_encrypted_phrase',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function shift_form()
+{
+    $form['shift_value'] = array(
+        '#title' => 'Shift Value',
+        '#description' => t('Number of places to shift each letter over'),
+        '#type' => 'textfield',
+        '#element_validate' => array('element_validate_integer_positive'),
+        '#required' => TRUE,
+    );
+    $form['direction'] = array(
+        '#title' => 'Direction',
+        '#description' => t('Enter "right" to add the shift value to each character, or "left" to subtract.'),
+        '#type' => 'textfield',
+        '#element_validate' => array('element_validate_direction'),
+        '#required' => TRUE,
+    );
+    $form['phrase'] = array(
+        '#title' => 'Phrase',
+        '#description' => t('The phrase to be encrypted'),
+        '#type' => 'textfield',
+        '#element_validate' => array('element_validate_phrase'),
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Encrypt',
+    );
+    return $form;
+}
+
+function element_validate_direction()
+{
+
+}
+
+function element_validate_phrase()
+{
+
+}
+
+function shift_form_submit($form, &$form_state)
+{
+    $_SESSION['shift_value'] = $form_state['values']['shift_value'];
+    $_SESSION['direction'] = $form_state['values']['direction'];
+    $_SESSION['phrase'] = $form_state['values']['phrase'];
+    $form_state['redirect'] = 'shift_cipher_encryption';
+}
+
+function show_encrypted_phrase()
+{
+    $shift_value = $_SESSION['shift_value'];
+    $direction = $_SESSION['direction'];
+    $phrase = $_SESSION['phrase'];
+
+    return '
+        <p>Shift Value: '.$shift_value.'</p>
+        <p>Direction: '.$direction.'</p>
+        <p>Phrase: '.$phrase.'</p>
+    ';
+}

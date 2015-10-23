@@ -1,0 +1,5 @@
+name = Shift Cipher
+description = Encrypts user input by shifting characters by a specified amount and direction
+package = Epicodus practice modules
+core = 7.x
+files[] = shift_cipher.module
