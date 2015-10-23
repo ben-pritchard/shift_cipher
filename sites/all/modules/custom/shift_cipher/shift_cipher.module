@@ -66,9 +66,39 @@ function element_validate_phrase($element)
 
 function shift_form_submit($form, &$form_state)
 {
+    $shift_value = $form_state['values']['shift_value'];
+    $direction = $form_state['values']['direction'];
+    $phrase = $form_state['values']['phrase'];
+    $encryption = null;
+    $encryption_array = array();
+
+    // Mod $shift_value by 26 to get actual shift happening
+    $shift_value = $shift_value % 26;
+
+    // Change negative $shift_values to a positive number that will wrap around to the negative equivalent
+    if ($direction == 'left') {
+        $shift_value *= -1;
+        $shift_value += 26;
+    }
+
+    // Split phrase into an array of lowercase characters
+    $phrase_array = str_split(strtolower($phrase));
+
+    // Loop through array and if a character is alphabetic:
+    // Find how far from "a" the $char is and then add the $shift_value but mod by 26 to get value to add to 97 which is "a"
+    foreach($phrase_array as $index => $char) {
+        if (ctype_alpha($char)) {
+            $encryption_array[$index] = chr(97 + (ord($char) - 97 + $shift_value) % 26);
+        } else {
+            $encryption_array[$index] = $char;
+        }
+    }
+
+    $_SESSION['encryption'] = join('', $encryption_array);
     $_SESSION['shift_value'] = $form_state['values']['shift_value'];
     $_SESSION['direction'] = $form_state['values']['direction'];
     $_SESSION['phrase'] = $form_state['values']['phrase'];
+
     $form_state['redirect'] = 'shift_cipher_encryption';
 }
 
@@ -77,10 +107,13 @@ function show_encrypted_phrase()
     $shift_value = $_SESSION['shift_value'];
     $direction = $_SESSION['direction'];
     $phrase = $_SESSION['phrase'];
+    $encryption = $_SESSION['encryption'];
+    $test = $_SESSION['test'];
 
     return '
         <p>Shift Value: '.$shift_value.'</p>
         <p>Direction: '.$direction.'</p>
-        <p>Phrase: '.$phrase.'</p>
+        <p>Original Phrase: '.$phrase.'</p>
+        <h3>Encrypted Message: '.$encryption.'</h3>
     ';
 }
